@@ -9,6 +9,9 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
+import SelectInput from "@mui/material/Select/SelectInput";
+import Box from '@mui/material/Box';
+import LinearProgress from '@mui/material/LinearProgress';
 
 const Blogs = () => {
 
@@ -31,9 +34,33 @@ const Blogs = () => {
         number: 0,
         text: ""
     });
+    const [response, setResponse] = React.useState({});
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    React.useEffect(() => {
+        // GET request using fetch inside useEffect React hook
+        async function sleep() {
+            console.log("sleep start");
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            console.log("sleep done");
+            fetch('https://jsonplaceholder.typicode.com/posts')
+                .then(response => response.json())
+                .then(data => { setResponse(data) });
+            console.log('i fire once');
+        }
+        sleep();
+
+
+
+        // empty dependency array means this effect will only run once (like componentDidMount in classes)
+    }, []);
 
     return (
         <div>
+            {console.log(response)}
             <h1>Blog Articles</h1>
             {account}
             <br></br>
@@ -53,36 +80,40 @@ const Blogs = () => {
             <button onClick={() => setCounter(prevCounter => ({
                 ...prevCounter, number: prevCounter.number - parseInt(counter.text)
             }))}> Counter decrement </button>
-            <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+            <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
 
-                {objects.map((item, index) => {
+                {response.length >= 1 ? response.map((item, index) => {
                     return (
                         <div>
-                    <Divider variant="inset" component="li" />
-                    <ListItem alignItems="flex-start">
-                    <ListItemAvatar>
-                      <Avatar alt="Cindy Baker" src="public/favicon.ico" />
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary="Oui Oui"
-                      secondary={
-                        <React.Fragment>
-                          <Typography
-                            sx={{ display: 'inline' }}
-                            component="span"
-                            variant="body2"
-                            color="text.primary"
-                          >
-                            Sandra Adams
-                          </Typography>
-                          {' — Do you have Paris recommendations? Have you ever…'}
-                        </React.Fragment>
-                      }
-                    />
-                  </ListItem>
-                  </div>)
-                    
-                })}
+                            <Divider variant="inset" component="li" />
+                            <ListItem alignItems="flex-start">
+                                <ListItemAvatar>
+                                    <h1>{index}</h1>
+                                </ListItemAvatar>
+                                <ListItemText
+                                    primary={item.title}
+                                    secondary={
+                                        <React.Fragment>
+                                            <Typography
+                                                sx={{ display: 'inline' }}
+                                                component="span"
+                                                variant="body2"
+                                                color="text.primary"
+                                            >
+                                                {item.body}
+                                            </Typography>
+
+                                        </React.Fragment>
+                                    }
+                                />
+                            </ListItem>
+                        </div>)
+
+                }) :
+                    <Box sx={{ width: '100%' }}>
+                        <LinearProgress />
+                    </Box>
+                }
             </List>
         </div>
     );
