@@ -8,28 +8,21 @@ import Login from './Login';
 import { useSelector, useDispatch } from "react-redux"
 import { bindActionCreators } from "redux"
 import { actionCreators } from "./state/index"
+import Register from './pages/Register';
 
 
 export default function App() {
-
-
-  const account = useSelector((state) => state.account);
-  const dispatch = useDispatch();
-  const { depositMoney, withdrawMoney } = bindActionCreators(actionCreators, dispatch)
-  console.log(account)
-
 
   return (
 
     <BrowserRouter>
       <Routes>
-        <Route path='login' element = {<Login />} />
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="blogs" element={<Blogs />} />
-          <Route path="*" element={<NoPage />} />
-
-        </Route>
+        <Route path='/login' element = {<Login />} />
+        <Route path="/" element={ <Layout />}/>
+        <Route path="/home" element={<Home />} />
+        <Route path="/blogs" element={<Blogs />} />
+        <Route path="*" element={<NoPage />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </BrowserRouter>
   );

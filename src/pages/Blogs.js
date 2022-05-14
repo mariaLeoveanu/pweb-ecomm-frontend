@@ -14,31 +14,8 @@ import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
 
 const Blogs = () => {
-
-    const objects = [
-        {
-            title: "Leo",
-            value: "Cea mai super"
-        },
-        {
-            title: "Victor",
-            value: "E mai naspa"
-        }
-    ]
-
-    const account = useSelector((state) => state.account);
-    const dispatch = useDispatch();
-    const { depositMoney, withdrawMoney } = bindActionCreators(actionCreators, dispatch)
-    console.log(account)
-    const [counter, setCounter] = React.useState({
-        number: 0,
-        text: ""
-    });
     const [response, setResponse] = React.useState({});
-
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
+    const store = useSelector((state) => state);
 
     React.useEffect(() => {
         // GET request using fetch inside useEffect React hook
@@ -62,15 +39,15 @@ const Blogs = () => {
         <div>
             {console.log(response)}
             <h1>Blog Articles</h1>
-            {account}
+            {/* {account} */}
             <br></br>
-            <button onClick={() => depositMoney(1000)}> Deposit </button>
-            <button onClick={() => withdrawMoney(1000)}> withdraw </button>
+            {/* <button onClick={() => depositMoney(1000)}> Deposit </button>
+            <button onClick={() => withdrawMoney(1000)}> withdraw </button> */}
             <br></br>
-            {counter.number}
+            {/* {counter.number} */}
             {/* <input onChange={event => setTitle(event.target.value)} /> */}
 
-            <input onChange={event => setCounter((prev) => ({
+            {/* <input onChange={event => setCounter((prev) => ({
                 ...prev, text: event.target.value
             }))} />
             {counter.text}
@@ -79,7 +56,7 @@ const Blogs = () => {
             }))}> Counter increment </button>
             <button onClick={() => setCounter(prevCounter => ({
                 ...prevCounter, number: prevCounter.number - parseInt(counter.text)
-            }))}> Counter decrement </button>
+            }))}> Counter decrement </button> */}
             <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
 
                 {response.length >= 1 ? response.map((item, index) => {
@@ -115,6 +92,7 @@ const Blogs = () => {
                     </Box>
                 }
             </List>
+            {console.log(store)}
         </div>
     );
 };
