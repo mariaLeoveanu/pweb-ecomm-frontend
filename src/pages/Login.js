@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { auth, logInWithEmailAndPassword, signInWithGoogle } from "./firebase";
+import { auth, logInWithEmailAndPassword, signInWithGoogle } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
@@ -9,6 +9,12 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { actionCreators } from '../state';
+import { bindActionCreators } from "redux"
+import { useSelector, useDispatch } from "react-redux"
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+
+
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -16,6 +22,8 @@ function Login() {
     const [user, loading, error] = useAuthState(auth);
     const navigate = useNavigate();
     const [isVisible, setVisible] = useState(false);
+    const dispatch = useDispatch();
+    const { setCurrentUser } = bindActionCreators(actionCreators, dispatch)
 
     useEffect(() => {
         if (loading) {
@@ -27,6 +35,20 @@ function Login() {
     const togglePassword = () => {
         setVisible(!isVisible);
     };
+
+    function sendLoginRequest(auth, email, password) {
+        signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            console.log(userCredential)
+            setCurrentUser(userCredential)
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.log(error)
+        });
+    }
+
 
     return (
         <div>
@@ -60,7 +82,7 @@ function Login() {
             />
             <Button
                 variant="outlined"
-                onClick={() => logInWithEmailAndPassword(email, password)}>
+                onClick={(e) => sendLoginRequest(auth, email, password)}>
                 Log in
             </Button>
 
@@ -76,5 +98,7 @@ function Login() {
         </div>
     )
 }
+
+// onClick={() => logInWithEmailAndPassword(email, password)}>
 
 export default Login

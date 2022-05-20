@@ -1,98 +1,188 @@
 import { useSelector, useDispatch } from "react-redux"
+import { Outlet, Link, useNavigate } from "react-router-dom";
 import { bindActionCreators } from "redux"
 import { actionCreators } from "../state/index"
+import { Article } from "../components/Article"
+import { User } from "../components/User"
+import { Comment } from "../components/Comment"
 import * as React from "react"
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
 import Divider from '@mui/material/Divider';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import Avatar from '@mui/material/Avatar';
-import Typography from '@mui/material/Typography';
-import SelectInput from "@mui/material/Select/SelectInput";
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
+import Stack from '@mui/material/Stack';
+import { getEmail } from '../state/store'
+import { auth } from "../firebase"
+import { onAuthStateChanged } from "firebase/auth"
+import { OutlinedInput, Button } from "@mui/material";
+import { getAuth, signOut } from "firebase/auth";
 
 const Blogs = () => {
     const [response, setResponse] = React.useState({});
+    const [followers, setFollowers] = React.useState([]);
+    const [selectedArticleId, setSelectedArticleId] = React.useState({});
+    const [articleComments, setArticleComments] = React.useState([]);
+    const [email, setEmail] = React.useState("none")
+    const dispatch = useDispatch();
     const store = useSelector((state) => state);
+    const { setCurrentUser } = bindActionCreators(actionCreators, dispatch)
+    const navigate = useNavigate();
 
     React.useEffect(() => {
-        // GET request using fetch inside useEffect React hook
-        async function sleep() {
-            console.log("sleep start");
-            await new Promise(resolve => setTimeout(resolve, 3000));
-            console.log("sleep done");
-            fetch('https://jsonplaceholder.typicode.com/posts')
-                .then(response => response.json())
-                .then(data => { setResponse(data) });
-            console.log('i fire once');
+        auth.onAuthStateChanged(user => {
+            setEmail(user.email);
+        });
+        console.log(email)
+    }, [email])
+
+    React.useEffect(() => {
+        if(email !== "none"){
+            fetch('http://127.0.0.1:8000/user/get-following/' + email)
+            .then(response => response.json())
+            .then(data => setFollowers(data));
         }
-        sleep();
+
+    }, [email])
+
+
+    React.useEffect(() => {
+        fetch('http://127.0.0.1:8000/news/get-news')
+            .then(response => response.json())
+            .then(data => setResponse(data));
+
+    }, [email]);
 
 
 
-        // empty dependency array means this effect will only run once (like componentDidMount in classes)
-    }, []);
+    // React.useEffect(() => {
+    //     console.log(store)
+    //     // if(auth.currentUser != null){
+    //     //
+    //     // }
+
+    // }, [])
+
+    React.useEffect(() => {
+        fetch("http://127.0.0.1:8000/comments/" + selectedArticleId)
+            .then(response => response.json())
+            .then(data => setArticleComments(data));
+    }, [selectedArticleId])
+
+    function action(id) {
+        setSelectedArticleId(id);
+    }
+
+    async function signoutRedirect() {
+        await auth.signOut()
+        navigate('/login')
+    }
 
     return (
         <div>
-            {console.log(response)}
             <h1>Blog Articles</h1>
-            {/* {account} */}
+            {/* {store.account.user.email} */}
             <br></br>
-            {/* <button onClick={() => depositMoney(1000)}> Deposit </button>
-            <button onClick={() => withdrawMoney(1000)}> withdraw </button> */}
-            <br></br>
-            {/* {counter.number} */}
-            {/* <input onChange={event => setTitle(event.target.value)} /> */}
+            <Button
+                variant="outlined"
+                onClick={signoutRedirect}>
+                Logout
+            </Button>
+            <Stack direction="row" spacing={2}>
+                <Box style={{ margin: '1%' }}
+                    sx={{
+                        boxShadow: 3,
+                        bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#101010' : '#fff'),
+                        color: (theme) =>
+                            theme.palette.mode === 'dark' ? 'grey.300' : 'grey.800',
+                        borderRadius: 2,
+                        textAlign: 'center',
+                        width: '100%',
+                        fontWeight: '700',
+                    }}
+                >
+                    <List sx={{ bgcolor: 'background.paper' }}>
 
-            {/* <input onChange={event => setCounter((prev) => ({
-                ...prev, text: event.target.value
-            }))} />
-            {counter.text}
-            <button onClick={() => setCounter(prevCounter => ({
-                ...prevCounter, number: prevCounter.number + parseInt(counter.text)
-            }))}> Counter increment </button>
-            <button onClick={() => setCounter(prevCounter => ({
-                ...prevCounter, number: prevCounter.number - parseInt(counter.text)
-            }))}> Counter decrement </button> */}
-            <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+                        {followers.length >= 1 ? followers.map((item, index) => {
+                            return (
+                                <div>
+                                    <User name={item.name} email={item.email} url={item.location} />
+                                </div>
+                            )
 
-                {response.length >= 1 ? response.map((item, index) => {
-                    return (
-                        <div>
-                            <Divider variant="inset" component="li" />
-                            <ListItem alignItems="flex-start">
-                                <ListItemAvatar>
-                                    <h1>{index}</h1>
-                                </ListItemAvatar>
-                                <ListItemText
-                                    primary={item.title}
-                                    secondary={
-                                        <React.Fragment>
-                                            <Typography
-                                                sx={{ display: 'inline' }}
-                                                component="span"
-                                                variant="body2"
-                                                color="text.primary"
-                                            >
-                                                {item.body}
-                                            </Typography>
+                        }) :
+                            <h2>You are not following anybody!</h2>
+                        }
+                    </List>
 
-                                        </React.Fragment>
-                                    }
-                                />
-                            </ListItem>
-                        </div>)
+                </Box>
 
-                }) :
-                    <Box sx={{ width: '100%' }}>
-                        <LinearProgress />
-                    </Box>
-                }
-            </List>
-            {console.log(store)}
+
+
+                <Box style={{ margin: '1%' }}
+                    sx={{
+                        boxShadow: 3,
+                        bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#101010' : '#fff'),
+                        color: (theme) =>
+                            theme.palette.mode === 'dark' ? 'grey.300' : 'grey.800',
+                        borderRadius: 2,
+                        textAlign: 'center',
+                        width: '100%',
+                        fontWeight: '700',
+                    }}
+                >
+                    <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+
+                        {response.length >= 1 ? response.map((item, index) => {
+                            return (
+                                <div>
+                                    <Article clickAction={() => action(item.id)} articleUrl={item.url} title={item.title} description={item.description} url={item.image_url} />
+                                </div>
+                            )
+
+                        }) :
+                            <Box sx={{ width: '100%' }}>
+                                <LinearProgress />
+                            </Box>
+                        }
+                        <Divider variant="inset" component="li" />
+                    </List>
+                </Box>
+
+
+
+                <Box style={{ margin: '1%' }}
+                    sx={{
+                        boxShadow: 3,
+                        borderRadius: 2,
+                        textAlign: 'center',
+                        width: '100%',
+                        fontWeight: '700',
+                    }}
+                >
+                    <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+
+                        {articleComments.length >= 1 ? articleComments.map((item, index) => {
+                            return (
+                                <div>
+                                    <Comment name={item.user.name} comment={item.content} />
+                                </div>
+                            )
+
+                        }) :
+                            <h2>This article doesn't have any comments.</h2>
+                        }
+                    </List>
+                </Box>
+
+
+
+
+
+
+            </Stack>
+
+
+
         </div>
     );
 };

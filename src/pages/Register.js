@@ -6,6 +6,8 @@ import React, { useEffect, useState } from "react";
 import { OutlinedInput, Button } from "@mui/material";
 import { actionCreators } from '../state';
 import { useNavigate } from "react-router-dom";
+import { auth } from "../firebase";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 function Register() {
     const store = useSelector((state) => state);
@@ -14,31 +16,45 @@ function Register() {
     let navigate = useNavigate();
     const [name, setName] = useState("")
     const dispatch = useDispatch();
-    const {setCurrentUser} = bindActionCreators(actionCreators, dispatch)
+    const { setCurrentUser } = bindActionCreators(actionCreators, dispatch)
 
-    function sendRegisterRequest(){
+    function sendRegisterRequest() {
         let status = 0;
         const requestOptions = {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 name: name,
                 email: email,
                 password: password
             })
         };
-        fetch('http://127.0.0.1:8000/auth/register/', requestOptions)
+        fetch('http://127.0.0.1:8000/auth/register', requestOptions)
             .then(response => {
-                if(response.ok){
+                if (response.ok) {
                     status = 1;
                     navigate("../blogs");
                 }
                 return response.json();
             })
             .then(data => setCurrentUser(data));
+    }
 
 
-
+    function registerFirebase(auth) {
+        createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                // Signed in
+                sendRegisterRequest().then(() =>
+                    setCurrentUser(userCredential)
+                )
+                // ...
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                // ..
+            });
     }
     return (
         <div>
@@ -74,7 +90,7 @@ function Register() {
             </Box>
             <Button
                 variant="outlined"
-                onClick={() => sendRegisterRequest()}>
+                onClick={() => registerFirebase(auth)}>
                 Register
             </Button>
         </div>
