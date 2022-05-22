@@ -108,7 +108,7 @@ function Register() {
                     Register
                 </Button>
                 <div style={{ margin: '1%' }}>
-                    Already have an account? <Link to="/login">Login</Link> now.
+                    Already have an account? <Link to="/">Login</Link> now.
                 </div>
             </Box>
         </div>

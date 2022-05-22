@@ -59,7 +59,7 @@ const Blogs = () => {
 
     async function signoutRedirect() {
         await auth.signOut()
-        navigate('/login')
+        navigate('/')
     }
 
     async function refreshArticles() {
@@ -220,7 +220,7 @@ const Blogs = () => {
                 <IconButton onClick={() => refreshArticles()} aria-label="delete" color="primary">
                     <RefreshIcon />
                 </IconButton>
-                <IconButton color="primary">
+                <IconButton onClick={signoutRedirect} color="primary">
                     <LogoutIcon></LogoutIcon>
                     Logout
                 </IconButton>
