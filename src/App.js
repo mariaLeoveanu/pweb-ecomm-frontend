@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Blogs from "./pages/Blogs";
 import NoPage from "./pages/NoPage";
 import Login from './pages/Login';
+import Profile from './pages/Profile';
 import { useSelector, useDispatch } from "react-redux"
 import { bindActionCreators } from "redux"
 import { actionCreators } from "./state/index"
@@ -30,6 +31,7 @@ const App = () => {
           <Route path="/blogs" element={<Blogs />} />
           <Route path="*" element={<NoPage />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/update-profile" element={<Profile/>} />
         </Routes>
       </BrowserRouter>
     );

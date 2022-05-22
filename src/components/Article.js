@@ -29,7 +29,7 @@ export class Article extends React.Component {
 
                             </React.Fragment>
                         }
-                    />
+                    ></ListItemText>
                 </ListItem>
                 <h5>For the full article click <a href={this.props.articleUrl}> here</a></h5>
             </div>

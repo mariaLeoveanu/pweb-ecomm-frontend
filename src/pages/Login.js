@@ -38,63 +38,77 @@ function Login() {
 
     function sendLoginRequest(auth, email, password) {
         signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            console.log(userCredential)
-            setCurrentUser(userCredential)
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            console.log(error)
-        });
+            .then((userCredential) => {
+                console.log(userCredential)
+                setCurrentUser(userCredential)
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(error)
+            });
     }
 
 
     return (
         <div>
-            <Box
-                component="form"
+            <h1 style={{ textAlign: 'center' }}>BE TOGETHER</h1>
+
+            <Box style={{ padding: '5%', margin: '0 auto' }}
                 sx={{
-                    '& > :not(style)': { m: 1, width: '25ch' },
+                    boxShadow: 3,
+                    bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#101010' : '#fff'),
+                    color: (theme) =>
+                        theme.palette.mode === 'dark' ? 'grey.300' : 'grey.800',
+                    borderRadius: 2,
+                    textAlign: 'center',
+                    width: '70%',
+                    fontWeight: '700',
                 }}
-                noValidate
-                autoComplete="off"
             >
-                <TextField onChange={(e) => { setEmail(e.target.value); console.log(email) }} id="outlined-basic" label="Email" variant="outlined" />
+                <h2> Login here</h2>
+
+                <Box
+                    component="form"
+                    sx={{
+                        '& > :not(style)': { m: 1, width: '25ch' },
+                    }}
+                    noValidate
+                    autoComplete="off"
+                >
+                    <TextField onChange={(e) => { setEmail(e.target.value); console.log(email) }} id="outlined-basic" label="Email" variant="outlined" />
+                </Box><br />
+
+                <OutlinedInput
+                    style={{ margin: '1%', width: '25ch' }}
+                    id="outlined-adornment-password"
+                    type={isVisible ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => { setPassword(e.target.value); console.log(password) }}
+                    endAdornment={
+                        <InputAdornment position="end">
+                            <IconButton
+                                aria-label="toggle password visibility"
+                                onClick={togglePassword}
+                                edge="end"
+                            >
+                                {isVisible ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                        </InputAdornment>
+                    }
+                    label="Password"
+                /><br />
+                <Button
+                    style={{ margin: '1%' }}
+                    variant="contained"
+                    onClick={(e) => sendLoginRequest(auth, email, password)}>
+                    Log in
+                </Button><br />
+
+                <div>
+                    Don't have an account? <Link to="/register">Register</Link> now.
+                </div>
             </Box>
-            <OutlinedInput
-                id="outlined-adornment-password"
-                type={isVisible ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => { setPassword(e.target.value); console.log(password) }}
-                endAdornment={
-                    <InputAdornment position="end">
-                        <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={togglePassword}
-                            edge="end"
-                        >
-                            {isVisible ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                    </InputAdornment>
-                }
-                label="Password"
-            />
-            <Button
-                variant="outlined"
-                onClick={(e) => sendLoginRequest(auth, email, password)}>
-                Log in
-            </Button>
-
-            <Button
-                variant="outlined"
-                onClick={() => signInWithGoogle()}>
-                Log in with google
-            </Button>
-
-            <div>
-                Don't have an account? <Link to="/register">Register</Link> now.
-            </div>
         </div>
     )
 }
